@@ -42,6 +42,17 @@ def submit():
     cur.close()
     return jsonify({'message': new_message})
 
+@app.route('/health')
+def health_check():
+    try:
+        # Try to make a simple query to check DB connection
+        cur = mysql.connection.cursor()
+        cur.execute('SELECT 1')
+        cur.close()
+        return jsonify({'status': 'healthy', 'db': 'connected'}), 200
+    except Exception as e:
+        return jsonify({'status': 'unhealthy', 'db': 'disconnected', 'error': str(e)}), 500
+
 if __name__ == '__main__':
     init_db()
     app.run(host='0.0.0.0', port=5000, debug=True)
